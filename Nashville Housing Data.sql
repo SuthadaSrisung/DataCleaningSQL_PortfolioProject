@@ -1,6 +1,6 @@
 /*
 
-Cleaning Data inSQL Queries
+Cleaning Data in SQL Queries
 
 /*
 
@@ -39,7 +39,7 @@ order by ParcelID
 
 
 
-Select a.ParcelID,a.PropertyAddress, b.ParcelID,b.PropertyAddress
+Select a.ParcelID, a.PropertyAddress, b.ParcelID,b.PropertyAddress
 From PortfolioProject.dbo.NashvilleHousing a
 JOIN PortfolioProject.dbo.NashvilleHousing b
 	ON a.ParcelID = b.ParcelID
@@ -48,8 +48,8 @@ Where a.PropertyAddress is null
 
 
 Select a.ParcelID,a.PropertyAddress, b.ParcelID,b.PropertyAddress, ISNULL(a.PropertyAddress,b.PropertyAddress)
-From [PortfolioProject].[dbo].[NashvilleHousing] a
-JOIN [PortfolioProject].[dbo].[NashvilleHousing] b
+From PortfolioProject.dbo.NashvilleHousing a
+JOIN PortfolioProject.dbo.NashvilleHousing b
 	ON a.ParcelID = b.ParcelID
 	AND a.[UniqueID] <> b.[UniqueID]
 Where a.PropertyAddress is null
@@ -57,19 +57,19 @@ Where a.PropertyAddress is null
 
 Update a
 SET PropertyAddress = ISNULL(a.PropertyAddress,b.PropertyAddress)
-From [PortfolioProject].[dbo].[NashvilleHousing] a
-JOIN [PortfolioProject].[dbo].[NashvilleHousing] b
+From PortfolioProject.dbo.NashvilleHousing a
+JOIN PortfolioProject.dbo.NashvilleHousing b
 	ON a.ParcelID = b.ParcelID
 	AND a.[UniqueID] <> b.[UniqueID]
 Where a.PropertyAddress is null
 
 
 
-Select a.ParcelID,a.PropertyAddress, b.ParcelID,b.PropertyAddress,
+Select a.ParcelID, a.PropertyAddress, b.ParcelID,b.PropertyAddress,
 ISNULL(a.PropertyAddress,b.PropertyAddress)
 
-From [PortfolioProject].[dbo].[NashvilleHousing] a
-JOIN [PortfolioProject].[dbo].[NashvilleHousing] b
+From PortfolioProject.dbo.NashvilleHousing a
+JOIN PortfolioProject.dbo.NashvilleHousing b
 	ON a.ParcelID = b.ParcelID
 	AND a.[UniqueID] <> b.[UniqueID]
 --Where a.PropertyAddress is null
@@ -79,32 +79,32 @@ JOIN [PortfolioProject].[dbo].[NashvilleHousing] b
 --Breaking out Address into Individual Columns(Address, City, State)
 
 Select PropertyAddress
-From [PortfolioProject].[dbo].[NashvilleHousing]
+From PortfolioProject.dbo.NashvilleHousing
 
---1. PropertyAddress : separate by SUBSTRING,CHARINDEX
+--1. PropertyAddress: separate by SUBSTRING, CHARINDEX
+
 Select
 SUBSTRING(PropertyAddress,1,CHARINDEX(',',PropertyAddress)-1) as Address,
 SUBSTRING(PropertyAddress, CHARINDEX(',',PropertyAddress)+1, LEN(PropertyAddress)) as Address
-From [PortfolioProject].[dbo].[NashvilleHousing]
+From PortfolioProject.dbo.NashvilleHousing
 
 
-ALTER TABLE [PortfolioProject].[dbo].[NashvilleHousing]
+ALTER TABLE PortfolioProject.dbo.NashvilleHousing
 ADD PropertySplitAddress varchar(255);
 
-Update [PortfolioProject].[dbo].[NashvilleHousing]
+Update PortfolioProject.dbo.NashvilleHousing
 SET PropertySplitAddress = SUBSTRING(PropertyAddress,1,CHARINDEX(',',PropertyAddress)-1) 
 
 
-ALTER TABLE [PortfolioProject].[dbo].[NashvilleHousing]
+ALTER TABLE PortfolioProject.dbo.NashvilleHousing
 ADD PropertySplitCity varchar(255);
 
-Update [PortfolioProject].[dbo].[NashvilleHousing]
+Update PortfolioProject.dbo.NashvilleHousing
 SET PropertySplitCity  = SUBSTRING(PropertyAddress, CHARINDEX(',',PropertyAddress)+1, LEN(PropertyAddress)) 
 
 
 
---2. OwnerAddress :  : separate by PARSENAME,REPLACE
-
+--2. OwnerAddress: separate by PARSENAME, REPLACE
 
 Select OwnerAddress
 From PortfolioProject.dbo.NashvilleHousing
@@ -120,7 +120,7 @@ From PortfolioProject.dbo.NashvilleHousing
 ALTER TABLE PortfolioProject.dbo.NashvilleHousing
 ADD OwnerSplitAddress varchar(255);
 
-Update [PortfolioProject].[dbo].[NashvilleHousing]
+Update PortfolioProject.dbo.NashvilleHousing
 SET OwnerSplitAddress = PARSENAME(REPLACE(OwnerAddress,',','.'),3)
 
 
@@ -139,7 +139,7 @@ SET OwnerSplitState  = PARSENAME(REPLACE(OwnerAddress,',','.'),1)
 
 
 --------------------------------------------------------------------
---change Y and N to Tes and No in "Sold As Vacant" field
+--Change Y and N to Yes and No in the "Sold As Vacant" field
 
 
 Select Distinct(SoldAsVacant), Count(SoldAsVacant)
@@ -169,10 +169,10 @@ SET SoldAsVacant  = CASE	When SoldAsVacant = 'Y' THEN 'Yes'
 
 Select *,
 	ROW_NUMBER() OVER(PARTITION BY	ParcelID,
-									PropertyAddress,
-									SaleDate,
-									SalePrice,
-									LegalReference
+					PropertyAddress,
+					SaleDate,
+					SalePrice,
+					LegalReference
 				 ORDER BY UniqueID) row_num
 
 From PortfolioProject.dbo.NashvilleHousing
@@ -183,10 +183,10 @@ From PortfolioProject.dbo.NashvilleHousing
 WITH RowNumCTE AS(
 Select *,
 	ROW_NUMBER() OVER(PARTITION BY	ParcelID,
-									PropertyAddress,
-									SaleDate,
-									SalePrice,
-									LegalReference
+					PropertyAddress,
+					SaleDate,
+					SalePrice,
+					LegalReference
 				 ORDER BY UniqueID) row_num
 
 From PortfolioProject.dbo.NashvilleHousing
@@ -223,5 +223,5 @@ From PortfolioProject.dbo.NashvilleHousing
 
 
 ALTER TABLE PortfolioProject.dbo.NashvilleHousing
-DROP COLUMN OwnerAddress,PropertyAddress
+DROP COLUMN OwnerAddress, PropertyAddress
 
